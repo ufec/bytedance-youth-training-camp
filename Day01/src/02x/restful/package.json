@@ -1,5 +1,5 @@
 {
-  "name": "day01",
+  "name": "restful",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,7 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "mysql2": "^2.3.0",
-    "sequelize": "^6.6.5"
+    "koa": "^2.13.1",
+    "koa-bodyparser": "^4.3.0",
+    "koa-router": "^10.1.1",
+    "mongoose": "^6.0.7"
   }
 }
