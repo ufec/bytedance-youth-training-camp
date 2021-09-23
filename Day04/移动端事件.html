@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>移动端事件</title>
+  <style>
+    #box {
+      width: 100px;
+      height: 100px;
+      background-color: red;
+    }
+  </style>
+</head>
+<body>
+  <div id="box">
+
+  </div>
+  <script>
+    let box = document.getElementById("box");
+    box.addEventListener('touchstart', (e)=>{
+      console.log('touchstart', e);
+    });
+    box.addEventListener('touchmove', (e)=>{
+      console.log('touchmove', e);
+      // e.changedTouches.length;
+      // e.touches.length
+    });
+    box.addEventListener('touchend', (e)=>{
+      console.log('touchend', e);
+    });
+
+    // 阻止默认事件
+    document.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+    }, {
+      passive: false
+    });
+  </script>
+</body>
+</html>

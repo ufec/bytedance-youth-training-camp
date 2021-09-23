@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>滑屏</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    #box {
+      margin: 20vh auto;
+      width: 260px;
+      height: 50vh;
+      border: 1px solid #000;
+      overflow: hidden;
+    }
+
+    #list {
+      margin: 0;
+      padding: 10px 5px;
+      list-style: none;
+      font: 16px/2 "宋体";
+    }
+    #list li {
+      border-bottom: 1px solid #000;
+    }
+  </style>
+</head>
+<body>
+  <div id="box">
+    <div id="list">
+      <li>这是第1个li</li>
+      <li>这是第2个li</li>
+      <li>这是第3个li</li>
+      <li>这是第4个li</li>
+      <li>这是第5个li</li>
+      <li>这是第6个li</li>
+      <li>这是第7个li</li>
+      <li>这是第8个li</li>
+      <li>这是第9个li</li>
+      <li>这是第10个li</li>
+      <li>这是第11个li</li>
+      <li>这是第12个li</li>
+      <li>这是第13个li</li>
+      <li>这是第14个li</li>
+      <li>这是第15个li</li>
+      <li>这是第16个li</li>
+      <li>这是第17个li</li>
+      <li>这是第18个li</li>
+      <li>这是第19个li</li>
+      <li>这是第20个li</li>
+      <li>这是第21个li</li>
+      <li>这是第22个li</li>
+      <li>这是第23个li</li>
+      <li>这是第24个li</li>
+      <li>这是第25个li</li>
+      <li>这是第26个li</li>
+      <li>这是第27个li</li>
+      <li>这是第28个li</li>
+      <li>这是第29个li</li>
+      <li>这是第30个li</li>
+      <li>这是第31个li</li>
+      <li>这是第32个li</li>
+      <li>这是第33个li</li>
+      <li>这是第34个li</li>
+      <li>这是第35个li</li>
+      <li>这是第36个li</li>
+      <li>这是第37个li</li>
+      <li>这是第38个li</li>
+      <li>这是第39个li</li>
+      <li>这是第40个li</li>
+      <li>这是第41个li</li>
+      <li>这是第42个li</li>
+      <li>这是第43个li</li>
+      <li>这是第44个li</li>
+      <li>这是第45个li</li>
+      <li>这是第46个li</li>
+      <li>这是第47个li</li>
+      <li>这是第48个li</li>
+      <li>这是第49个li</li>
+      <li>这是第50个li</li>
+      <li>这是第51个li</li>
+      <li>这是第52个li</li>
+      <li>这是第53个li</li>
+      <li>这是第54个li</li>
+      <li>这是第55个li</li>
+      <li>这是第56个li</li>
+      <li>这是第57个li</li>
+      <li>这是第58个li</li>
+      <li>这是第59个li</li>
+      <li>这是第60个li</li>
+      <li>这是第61个li</li>
+      <li>这是第62个li</li>
+      <li>这是第63个li</li>
+      <li>这是第64个li</li>
+      <li>这是第65个li</li>
+      <li>这是第66个li</li>
+      <li>这是第67个li</li>
+      <li>这是第68个li</li>
+      <li>这是第69个li</li>
+      <li>这是第70个li</li>
+      <li>这是第71个li</li>
+      <li>这是第72个li</li>
+      <li>这是第73个li</li>
+      <li>这是第74个li</li>
+      <li>这是第75个li</li>
+      <li>这是第76个li</li>
+      <li>这是第77个li</li>
+      <li>这是第78个li</li>
+      <li>这是第79个li</li>
+      <li>这是第80个li</li>
+      <li>这是第81个li</li>
+      <li>这是第82个li</li>
+      <li>这是第83个li</li>
+      <li>这是第84个li</li>
+      <li>这是第85个li</li>
+      <li>这是第86个li</li>
+      <li>这是第87个li</li>
+      <li>这是第88个li</li>
+      <li>这是第89个li</li>
+      <li>这是第90个li</li>
+      <li>这是第91个li</li>
+      <li>这是第92个li</li>
+      <li>这是第93个li</li>
+      <li>这是第94个li</li>
+      <li>这是第95个li</li>
+      <li>这是第96个li</li>
+      <li>这是第97个li</li>
+      <li>这是第98个li</li>
+      <li>这是第99个li</li>
+      <li>这是第100个li</li>
+    </div>
+  </div>
+  <script>
+    let list = document.querySelector("#list");
+    let startPoint = 0; // 按下时鼠标的位置
+    let startEl = 0; // 按下时元素的位置
+    list.addEventListener('touchstart', (e) => {
+      let touch = e.changedTouches[0];
+      startPoint = touch;
+    });
+  </script>
+</body>
+</html>
