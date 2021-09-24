@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">{{title}}</div>
+
+    <script>
+      function h(tag, props, children) {
+        return { tag, props, children };
+      }
+      // 1.基本结构
+      const Vue = {
+        // 扩展性
+        createRenderer({ querySelector, insert, createElement, remove }) {
+          // 返回渲染器
+          return {
+            createApp(options) {
+              // 返回app实例
+              return {
+                mount(selector) {
+                  // console.log('mount!');
+                  // 1.找到宿主元素
+                  const parent = querySelector(selector);
+
+                  // 2.渲染页面
+                  if (!options.render) {
+                    //   2.1处理template：编译
+                    options.render = this.compile(parent.innerHTML);
+                  }
+
+                  // setup和其他选项
+                  if (options.setup) {
+                    this.setupState = options.setup();
+                  }
+                  if (options.data) {
+                    this.data = options.data();
+                  }
+
+                  // app.xxx
+                  const proxy = new Proxy(this, {
+                    get(target, key) {
+                      // 先从setup中取，如果取不到再从data中取
+                      if (target.setupState && key in target.setupState) {
+                        return target.setupState[key];
+                      } else {
+                        return target.data[key];
+                      }
+                    },
+                    set(target, key, val) {
+                      if (target.setupState && key in target.setupState) {
+                        target.setupState[key] = val;
+                      } else {
+                        target.data[key] = val;
+                      }
+                    },
+                  });
+
+                  //   2.2用户直接编写render
+                  this.update = effect(() => {
+                    const vnode = options.render.call(proxy);
+                    if (!this.isMounted) {
+                      const el = this.createEle(vnode);
+                      parent.innerHTML = "";
+                      insert(el, parent);
+                      this.isMounted = true;
+                    } else {
+                      // diff
+                      this.patch(this._vnode, vnode);
+                    }
+                    this._vnode = vnode;
+                  });
+                },
+                // 根据render函数创建虚拟dom (vnode)
+                createEle(vnode) {
+                  const { tag, props, children } = vnode;
+                  const el = createElement(tag);
+                  if (typeof children === "string") {
+                    el.textContent = children;
+                  } else {
+                    // 递归遍历所有子节点，放到当前tag前
+                    children.forEach((child) => {
+                      insert(this.createEle(child), el);
+                    });
+                  }
+                  vnode.el = el;
+                  return el;
+                },
+
+                patch(n1, n2) {
+                  const el = (n2.el = n1.el);
+                  // n1是老节点
+                  // n2是新节点
+                  // 1.更新：必须更新相同节点
+                  if (n1.tag === n2.tag && n1.key === n2.key) {
+                    // update
+                    // props todo
+                    // children
+                    const oldCh = n1.children;
+                    const newCh = n2.children;
+
+                    if (typeof oldCh === "string") {
+                      if (typeof newCh === "string") {
+                        // text update
+                        if (oldCh !== newCh) {
+                          el.textContent = newCh;
+                        }
+                      } else {
+                        // 替换文本为一组子元素
+                        // 清空再创建并追加
+                        el.textContent = "";
+                        newCh.forEach((child) =>
+                          insert(this.createEle(child), el)
+                        );
+                      }
+                    } else {
+                      if (typeof newCh === "string") {
+                        // 替换一组子元素为文本
+                        el.textContent = newCh;
+                      } else {
+                        // updateChildren
+                        this.updateChildren(el, oldCh, newCh);
+                      }
+                    }
+                  } else {
+                    // replace
+                  }
+                },
+
+                updateChildren(el, oldCh, newCh) {
+                  // 1.获取newCh和oldCh中较短的那一个
+                  const len = Math.min(oldCh.length, newCh.length)
+                  // 强制更新
+                  for (let i = 0; i < len; i++) {
+                    this.patch(oldCh[i], newCh[i])
+                  }
+
+                  // 处理剩余元素
+                  // 新数组元素多
+                  if (newCh.length > oldCh.length) {
+                    // 批量创建并追加
+                    // 截取newCh中len后面的部分
+                    newCh.slice(len).forEach(child => {
+                      insert(this.createElm(child), el)
+                    })
+                  }
+                  else if(newCh.length < oldCh.length) {
+                    oldCh.slice(len).forEach(child => {
+                      remove(child.el, el)
+                    })
+                  }
+                },
+
+                // 编译模板
+                compile(template) {
+                  // 返回一个render函数
+                  // parse -> ast
+                  // generate -> ast=>render
+                  return function render() {
+                    if (Array.isArray(this.title)) {
+                      return h(
+                        "h3",
+                        null,
+                        this.title.map((s) => h("p", null, s))
+                      );
+                    } else {
+                      return h("h3", null, this.title);
+                    }
+                  };
+                },
+              };
+            },
+          };
+        },
+        createApp(options) {
+          // 创建一个web平台特有渲染器
+          const renderer = Vue.createRenderer({
+            querySelector(sel) {
+              return document.querySelector(sel);
+            },
+            insert(el, parent) {
+              parent.appendChild(el);
+            },
+            createElement(tag) {
+              return document.createElement(tag);
+            },
+            remove(el, parent) {
+              parent.removeChild(el);
+            },
+          });
+          return renderer.createApp(options);
+        },
+      };
+    </script>
+
+    <script>
+      const effectStack = [];
+      const targetMap = new WeakMap();
+
+      // 调用effect，首先执行fn
+      function effect(fn) {
+        const eff = function () {
+          try {
+            effectStack.push(eff);
+            fn();
+          } finally {
+            effectStack.pop();
+          }
+        };
+        eff();
+        return eff;
+      }
+
+      // 建立target key 的关系，构造 { target: { key: [effect0, effect1] } }
+      function track(target, key) {
+        const effect = effectStack[effectStack.length - 1];
+        if (!targetMap.has(target)) {
+          targetMap.set(target, new Map());
+        }
+        const map = targetMap.get(target);
+        if (!map.has(key)) {
+          map.set(key, new Set());
+        }
+        const deps = map.get(key);
+        deps.has(effect) || deps.add(effect);
+      }
+
+      // 从targetMap中获取target，取出对应要更新的key对应的依赖，并依次执行
+      function trigger(target, key) {
+        const map = targetMap.get(target);
+        if (map) {
+          const deps = map.get(key);
+          if (deps) {
+            deps.forEach((dep) => dep());
+          }
+        }
+      }
+
+      function reactive(obj) {
+        return new Proxy(obj, {
+          get(target, key) {
+            // // 建立依赖关系
+            track(target, key);
+            return target[key];
+          },
+          set(target, key, val) {
+            target[key] = val;
+            // // 通知更新
+            trigger(target, key);
+            console.log(targetMap);
+          },
+        });
+      }
+
+      const app = Vue.createApp({
+        setup() {
+          // created
+          const state = reactive({
+            title: "vue3, hello!",
+          });
+          setTimeout(() => {
+            state.title = 'hello, vue3!!!!!!!!!!!'.split('')
+          }, 2000);
+          return state;
+        },
+      });
+      app.mount("#app");
+    </script>
+  </body>
+</html>
